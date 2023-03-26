@@ -19,7 +19,7 @@ const remoteCmd = async (content, privateKeyPath, isRequired, label, sshCmdArgs)
     const rsyncStdout = (process.env.RSYNC_STDOUT || '').substring(0, dataLimit);
     console.log(`Executing remote script: DEBIAN_FRONTEND=noninteractive ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs)} ${rsyncServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`);
     exec(
-      `DEBIAN_FRONTEND=noninteractive ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs || '-o HostKeyAlgorithms=+ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa -o StrictHostKeyChecking=no')} ${rsyncServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`,
+      `ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs || '-o HostKeyAlgorithms=+ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa -o StrictHostKeyChecking=no')} ${rsyncServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`,
       (err, data = '', stderr = '') => {
         if (err) {
           const message = `⚠️ [CMD] Remote script failed in cmd_${label}: ${err.message}`;
