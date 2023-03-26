@@ -1,0 +1,54 @@
+name: "ssh deploy to server"
+description: "NodeJS action for FAST deployment with rsync/ssh and remote script execution before/after rsync"
+author: "gabo-p"
+inputs:
+  SSH_PRIVATE_KEY:
+    description: "Private key part of an SSH key pair"
+    required: true
+  REMOTE_HOST:
+    description: "Remote host"
+    required: true
+  REMOTE_USER:
+    description: "Remote user"
+    required: true
+  REMOTE_PORT:
+    description: "Remote port"
+    required: false
+    default: "22"
+  SOURCE:
+    description: "Source directory, path relative to `$GITHUB_WORKSPACE` root, eg: `dist/`"
+    required: false
+    default: ""
+  TARGET:
+    description: "Target directory"
+    required: false
+    default: ""
+  ARGS:
+    description: "Arguments to pass to rsync"
+    required: false
+    default: "-rlgoDzvc -i"
+  SSH_CMD_ARGS:
+    description: "An array of ssh arguments, they must be prefixed with -o and separated by a comma, for example: -o SomeArgument=no, -o SomeOtherArgument=5 "
+    required: false
+    default: "-o StrictHostKeyChecking=no"
+  EXCLUDE:
+    description: "paths to exclude separated by `,`, ie: `/dist/, /node_modules/`"
+    required: false
+    default: ""
+  SCRIPT_BEFORE:
+    description: "Script to run on host machine before rsync"
+    required: false
+    default: ""
+  SCRIPT_AFTER:
+    description: "Script to run on host machine after rsync"
+    required: false
+    default: ""
+outputs:
+  status:
+    description: "Status"
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  color: "green"
+  icon: "truck"
