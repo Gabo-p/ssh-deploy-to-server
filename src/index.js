@@ -33,7 +33,7 @@ const run = async () => {
   });
   // Check script after
   if (scriptAfter) {
-    await remoteCmdAfter(scriptAfter, privateKeyPath);
+    await remoteCmdAfter(scriptAfter, privateKeyPath, sshCmdArgs);
   }
 };
 

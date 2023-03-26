@@ -17,17 +17,17 @@ const remoteCmd = async (content, privateKeyPath, isRequired, label, sshCmdArgs)
     writeToFile({ dir: githubWorkspace, filename, content });
     const dataLimit = 10000;
     const rsyncStdout = (process.env.RSYNC_STDOUT || '').substring(0, dataLimit);
-    console.log(`Executing remote script: ssh -i ${privateKeyPath} ${sshServer}`);
+    console.log(`Executing remote script: DEBIAN_FRONTEND=noninteractive ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs || '-o StrictHostKeyChecking=no')} ${sshServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`);
     exec(
       `DEBIAN_FRONTEND=noninteractive ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs || '-o StrictHostKeyChecking=no')} ${sshServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`,
       (err, data = '', stderr = '') => {
         if (err) {
-          const message = `⚠️ [CMD] Remote script failed: ${err.message}`;
+          const message = `⚠️ [CMD] Remote script failed in cmd_${label}: ${err.message}`;
           console.warn(`${message} \n`, data, stderr);
           handleError(message, isRequired, reject);
         } else {
           const limited = data.substring(0, dataLimit);
-          console.log('✅ [CMD] Remote script executed. \n', limited, stderr);
+          console.log(`✅ [CMD] Remote script cmd_${label} executed. \n`, limited, stderr);
           resolve(limited);
         }
       }
