@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-const { rsyncServer, githubWorkspace, remotePort } = require('./inputs');
+const { githubWorkspace, remotePort, sshServer } = require('./inputs');
 const { writeToFile } = require('./helpers');
 
 const handleError = (message, isRequired, callback) => {
@@ -17,9 +17,9 @@ const remoteCmd = async (content, privateKeyPath, isRequired, label, sshCmdArgs)
     writeToFile({ dir: githubWorkspace, filename, content });
     const dataLimit = 10000;
     const rsyncStdout = (process.env.RSYNC_STDOUT || '').substring(0, dataLimit);
-    console.log(`Executing remote script: DEBIAN_FRONTEND=noninteractive ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs)} ${rsyncServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`);
+    console.log(`Executing remote script: ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs)} ${sshServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`);
     exec(
-      `ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs || '-o HostKeyAlgorithms=+ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa -o StrictHostKeyChecking=no')} ${rsyncServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`,
+      `DEBIAN_FRONTEND=noninteractive ssh -p ${(remotePort || 22)} -i ${privateKeyPath} ${(sshCmdArgs || '-o HostKeyAlgorithms=+ssh-dss -o PubkeyAcceptedAlgorithms=+ssh-rsa -o StrictHostKeyChecking=no')} ${sshServer} 'RSYNC_STDOUT="${rsyncStdout}" bash -s' < ${filename}`,
       (err, data = '', stderr = '') => {
         if (err) {
           const message = `⚠️ [CMD] Remote script failed in cmd_${label}: ${err.message}`;
